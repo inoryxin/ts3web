@@ -1,0 +1,55 @@
+# ts3web —— 浏览器 <-> TS3 语音网关
+# 用 1Panel 的「容器 -> 编排」导入，或直接 docker compose up -d
+networks:
+  1panel-network:
+    external: true
+
+services:
+  ts3web:
+    build:
+      context: .
+    container_name: ts3web
+    restart: always
+    environment:
+      # 只监听容器内网，由 1Panel 的 OpenResty 反代 wss
+      TS3WEB_BIND: "0.0.0.0:18080"
+      # TS3 服务器地址：同网络可直接用容器名（1Panel 里那个 teamspeak 容器）
+      TS3WEB_ADDR: "1Panel-teamspeak-nn9k:9987"
+      # 让网页用户进入哪个频道（按频道名/路径；留空则进默认频道）
+      # 服务器上现有：刑满释放 / 匡扶汉室 / 祈歆
+      TS3WEB_CHANNEL: "${TS3WEB_CHANNEL-刑满释放}"
+      # 频道口令（如果该频道设了密码）
+      # TS3WEB_CHANNEL_PASSWORD: ""
+      # 服务器口令（如果你的 TS3 服务器设了连接密码）
+      # TS3WEB_SERVER_PASSWORD: ""
+      # 访问口令：留空 = 不需要口令（任何人拿到链接就能进）；
+      # 想限制就把口令填在这里，网页链接要带 ?t=<口令>
+      TS3WEB_TOKEN: "${TS3WEB_TOKEN-}"
+      # TS3 里显示的昵称前缀，方便和真人客户端区分
+      TS3WEB_NICK_PREFIX: "网页-"
+      TS3WEB_MAX_SESSIONS: "8"
+      TS3WEB_LOG: "info"
+      # 排查开关（默认关闭）：
+      #   TS3WEB_DEBUG_AUDIO=1  把浏览器上行的前几帧解码出来算音量，用于排查"听不见"
+      #   TS3WEB_ALLOW_RAW=1    允许网页发原始 TS3 命令（{"type":"raw","cmd":"whoami"}）
+      TS3WEB_DEBUG_AUDIO: "${TS3WEB_DEBUG_AUDIO:-0}"
+      TS3WEB_ALLOW_RAW: "${TS3WEB_ALLOW_RAW:-0}"
+    ports:
+      # 只绑本机回环，外面走 OpenResty；调试时可 ssh 隧道到 18080
+      - "127.0.0.1:18080:18080"
+    volumes:
+      # 把导航页的图片资源只读挂进来：网页里用相对路径 assets/... 引用，
+      # 这样不管从内网(home.inory.xin)还是外网(inory.xin)访问，图都能出。
+      - /opt/1panel/www/sites/inory.xin/index/assets:/assets:ro
+    networks:
+      - 1panel-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.60"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

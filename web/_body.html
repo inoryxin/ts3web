@@ -1,0 +1,149 @@
+<!-- ============ 背景（沿用导航页）============ -->
+<div class="bg" id="bg" aria-hidden="true"></div>
+<div class="bg-veil" aria-hidden="true"></div>
+<div class="sakura" aria-hidden="true" style="position:fixed;inset:0;z-index:55;pointer-events:none;overflow:hidden">
+  <span class="petal" style="left:5%;font-size:16px;animation-duration:12s;animation-delay:0s">❀</span>
+  <span class="petal" style="left:18%;font-size:12px;animation-duration:15s;animation-delay:2.5s">✿</span>
+  <span class="petal" style="left:31%;font-size:19px;animation-duration:11s;animation-delay:1.2s">❀</span>
+  <span class="petal" style="left:44%;font-size:13px;animation-duration:17s;animation-delay:4s">✿</span>
+  <span class="petal" style="left:57%;font-size:17px;animation-duration:13s;animation-delay:0.6s">❀</span>
+  <span class="petal" style="left:69%;font-size:12px;animation-duration:16s;animation-delay:3.2s">✿</span>
+  <span class="petal" style="left:81%;font-size:18px;animation-duration:12.5s;animation-delay:5s">❀</span>
+  <span class="petal" style="left:92%;font-size:14px;animation-duration:14s;animation-delay:1.8s">✿</span>
+</div>
+
+<!-- ============ 大外框（沿用导航页：虚线内衬 + 胶带 + 四角纹样）============ -->
+<div class="stage">
+  <div class="frame">
+    <!-- 装饰层单独裁剪：外框本身要 overflow:visible（否则后代 sticky 失效），
+         胶带和光晕原来靠外框裁剪，所以这里补一层裁剪容器，视觉不变 -->
+    <span class="deco-clip" aria-hidden="true">
+      <span class="frame-glow"></span>
+      <span class="tape"></span>
+    </span>
+    <span class="orn orn-tl" aria-hidden="true">✦</span>
+    <span class="orn orn-tr" aria-hidden="true">❀</span>
+    <span class="orn orn-bl" aria-hidden="true">❀</span>
+    <span class="orn orn-br" aria-hidden="true">✦</span>
+
+    <div class="frame-grid">
+
+      <!-- ---------- 左：Logo + 立绘（导航页同款） ---------- -->
+      <aside class="side">
+        <div class="brand">
+          <span class="brand-art">
+            <!-- 相对路径：由本服务自己代发（见 src/http.rs 的 /assets/），
+                 这样从内网 home.inory.xin 或外网 inory.xin 访问都能出图 -->
+            <img class="brand-img" id="brandLogo" alt="许雪然"
+                 src="assets/logo.png" onerror="this.style.display='none'">
+          </span>
+          <div class="brand-sub">✿ 许雪然的 TS3 语音频道 ✿</div>
+        </div>
+
+        <div class="char">
+          <div class="bubble" id="bubble">今天也要元气满满鸭～</div>
+          <img class="char-img" alt="许雪然"
+               src="assets/xueran-desk.png" onerror="this.style.display='none'">
+          <span class="char-shadow" aria-hidden="true"></span>
+          <span class="char-spark s1" aria-hidden="true">✦</span>
+          <span class="char-spark s2" aria-hidden="true">✦</span>
+          <span class="char-spark s3" aria-hidden="true">✧</span>
+        </div>
+      </aside>
+
+      <span class="divider" aria-hidden="true"></span>
+
+      <!-- ---------- 右：语音控制 ---------- -->
+      <section class="main">
+        <div class="hello">
+          <div class="hello-time"><span id="clockTime">--:--</span><i id="clockSec">00</i></div>
+          <div class="hello-meta">
+            <b id="connBadge">未连接</b>
+            <span>浏览器直接说话 · 无需安装客户端 · 建议 Chrome / Edge</span>
+          </div>
+        </div>
+
+        <label class="fld" for="nick">你的昵称</label>
+        <input id="nick" type="text" maxlength="24" placeholder="例如：小明" autocomplete="off">
+        <div id="tokenRow" style="display:none">
+          <label class="fld" for="token">访问口令</label>
+          <input id="token" type="text" placeholder="粘贴链接里 ?t= 后面那一串" autocomplete="off">
+        </div>
+
+        <div class="row">
+          <button id="join" class="btn-main">加入语音</button>
+          <button id="leave" class="btn-ghost" disabled>离开</button>
+          <button id="mute" class="btn-ghost" disabled>静音</button>
+        </div>
+
+        <div class="vol">
+          <span>总音量</span>
+          <input id="volume" type="range" min="0" max="200" value="100">
+          <span id="volLabel">100%</span>
+        </div>
+
+        <label class="fld">你的麦克风</label>
+        <div id="micName" class="hint" style="margin:0 0 2px">（未选择）</div>
+        <meter id="micLevel" min="0" max="1" low="0.02" high="0.25" optimum="0.5" value="0"></meter>
+
+        <!-- ---------- 二级菜单：音频设置 ---------- -->
+        <details class="settings" id="settingsBox">
+          <summary>音频设置（默认已优化，点开可调）</summary>
+          <div class="settings-body">
+            <div class="ttl">音频处理</div>
+            <div class="grid">
+              <label class="chk"><input type="checkbox" id="optAec" checked> 回声消除</label>
+              <label class="chk"><input type="checkbox" id="optNs" checked> 噪声抑制（降噪）</label>
+              <label class="chk"><input type="checkbox" id="optAgc" checked> 麦克风自动增益</label>
+              <label class="chk"><input type="checkbox" id="optBalance" checked> 自动平衡各人音量</label>
+            </div>
+
+            <div class="ttl">麦克风发送方式</div>
+            <div class="grid">
+              <label class="chk"><input type="radio" name="txmode" id="txVad" value="vad" checked> 语音感应激活（推荐）</label>
+              <label class="chk"><input type="radio" name="txmode" id="txCont" value="cont"> 持续通话</label>
+              <label class="chk"><input type="radio" name="txmode" id="txPtt" value="ptt"> 按键通话（按住 空格）</label>
+            </div>
+            <div class="vol" id="vadRow" style="display:flex">
+              <span>触发阈值</span>
+              <input id="vadThresh" type="range" min="-60" max="-5" value="-30">
+              <span id="vadThreshLabel">-30 dB</span>
+            </div>
+            <div class="hint" id="vadState"></div>
+            <div class="hint" id="stats"></div>
+          </div>
+        </details>
+
+        <div id="status">点「加入语音」，浏览器会请求麦克风权限。</div>
+
+        <div class="tiles-head">
+          <span class="tiles-title">频道 / 成员</span>
+          <span class="tiles-tip">点频道即可切换，🔊 是你所在的频道</span>
+        </div>
+        <div id="channels" class="chans">
+          <div class="empty">加入后这里会显示服务器上的频道和成员。</div>
+        </div>
+        <div id="speakers"></div>
+        <div class="hint" id="hint"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ 看板娘（沿用导航页 .pet：点一下换 Q 版图 + 冒一句话）============ -->
+<div class="pet" id="pet" role="button" tabindex="0" aria-label="许雪然看板娘">
+  <div class="pet-bubble" id="petBubble">点我一下嘛～</div>
+  <img class="pet-img" id="petImg" alt="" draggable="false" src="assets/chibi/chibi-q1.png">
+</div>
+
+<!-- ============ 暗色模式切换（月亮/太阳，快捷键 D）============ -->
+<button class="theme-btn" id="btnTheme" title="切换暗色模式（快捷键 D）" aria-label="切换浅色 / 暗色模式">
+  <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5 14.8A8.7 8.7 0 0 1 9.2 3.5a8.7 8.7 0 1 0 11.3 11.3z"/>
+  </svg>
+  <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4.1"/>
+    <path d="M12 2.4v2.3M12 19.3v2.3M2.4 12h2.3M19.3 12h2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+  </svg>
+</button>

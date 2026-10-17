@@ -1,0 +1,176 @@
+/* ==========================================================================
+   ts3web：在导航页 style.css 之上补的部分
+   --------------------------------------------------------------------------
+   ★ 布局原则（和导航页完全一致，不要改）：
+     导航页本身就是"外框永远跟随窗口、只有右栏内部滚动"：
+       body{ overflow:hidden } / .stage{ position:fixed } / .frame{ height:100% }
+       .frame-grid{ height:100%; grid-template-rows:minmax(0,1fr) }
+       .side ：logo 在上，.char{flex:1} 撑满剩余高度 → 立绘自然踩在外框底边
+       .main ：右栏（滚动由内部的 .tiles-scroll 负责）
+     所以这里**不覆盖任何布局**，只把"右栏"变成滚动容器。
+     窄屏（≤860px）导航页自己的媒体查询会切成单栏 + body 可滚动，一并沿用。
+
+   ★ 颜色一律用导航页的 CSS 变量（--pink-* / --deep / --line / --mint …），
+     这样 html[data-theme="dark"] 一覆盖变量，这边的控件自动跟着变暗。
+   ========================================================================== */
+
+/* ---------- 右栏滚动（唯一需要改导航页行为的地方）---------- */
+.main{
+  overflow-y:auto;
+  overflow-x:hidden;
+  min-height:0;
+  overscroll-behavior:contain;
+}
+.main::-webkit-scrollbar{ width:9px; }
+.main::-webkit-scrollbar-track{ background:transparent; }
+.main::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--pink-3),var(--pink-4));
+  border-radius:99px;
+  border:2px solid rgba(255,255,255,.4);
+}
+/* 频道列表跟着右栏一起滚，避免出现两层滚动条 */
+.chans{ max-height:none; overflow:visible; }
+
+/* ---------- 表单控件：照导航页搜索条的质感 ---------- */
+label.fld{
+  display:block; font-size:12px; font-weight:800; color:var(--pink-5);
+  margin:12px 0 6px; letter-spacing:.03em;
+}
+input[type=text]{
+  width:100%; height:clamp(40px,5.8vh,48px); padding:0 18px; border-radius:999px;
+  border:3px solid var(--line);
+  background:linear-gradient(180deg,var(--pink-0),var(--pink-1));
+  color:var(--deep-2); font-size:14.5px; font-weight:700; outline:none; font-family:inherit;
+  box-shadow:0 10px 24px rgba(228,80,138,.14), inset 0 2px 0 rgba(255,255,255,.5);
+}
+input[type=text]::placeholder{ color:#c58fa9; }
+input[type=text]:focus{ border-color:var(--pink-4); box-shadow:0 0 0 4px rgba(255,127,174,.18); }
+
+.row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:clamp(9px,1.5vh,15px); }
+.row>button{ flex:1 1 110px; }
+/* 静音按钮的"已静音"状态：沿用导航页 .btn-ghost 的形状，只换配色（不能覆盖 class，否则丢样式） */
+.row>button.btn-ghost.danger{
+  background:linear-gradient(120deg,var(--pink-4),var(--pink-5));
+  color:#fff; border-color:#fff;
+  box-shadow:0 8px 18px rgba(228,80,138,.34);
+}
+
+.vol{ display:flex; align-items:center; gap:10px; margin-top:10px; }
+.vol input[type=range]{ flex:1; accent-color:var(--pink-4); cursor:var(--cursor-heart) 10 10,pointer; }
+.vol span{ font-size:12px; font-weight:800; color:var(--deep); opacity:.78; min-width:48px; text-align:right; }
+meter{ display:block; width:100%; height:10px; margin-top:6px; }
+
+/* ---------- 二级菜单（音频设置）---------- */
+details.settings{
+  margin-top:12px; border:3px solid var(--line); border-radius:var(--r-tile);
+  background:linear-gradient(180deg,var(--pink-0),var(--pink-1));
+  overflow:hidden; box-shadow:var(--shadow-soft); flex:0 0 auto;
+}
+details.settings>summary{
+  cursor:var(--cursor-heart) 10 10,pointer; padding:11px 16px; font-size:13px;
+  font-weight:800; color:var(--pink-5); list-style:none; user-select:none;
+}
+details.settings>summary::-webkit-details-marker{ display:none; }
+details.settings>summary::before{ content:"⚙ "; }
+details.settings>summary::after{ content:"　▾"; font-size:11px; opacity:.7; }
+details.settings[open]>summary::after{ content:"　▴"; }
+details.settings[open]>summary{ border-bottom:2px dashed var(--pink-2); }
+.settings-body{ padding:2px 16px 15px; }
+.grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px 14px; }
+label.chk{
+  display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700;
+  color:var(--deep-2); margin:6px 0; cursor:var(--cursor-heart) 10 10,pointer;
+}
+label.chk input{ accent-color:var(--pink-4); }
+.ttl{ font-size:11.5px; font-weight:800; color:var(--pink-5); margin:13px 0 3px; letter-spacing:.04em; }
+
+/* ---------- 连接状态徽章（#connBadge 的 JS 会重写 class，所以这里按 .badge 定样式）---------- */
+.hello-meta b.badge{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:2px 11px; border-radius:999px;
+  border:2px solid var(--pink-3); background:var(--pink-0); color:var(--pink-5);
+  font-size:12px; font-weight:800;
+}
+.hello-meta b.badge.on{
+  background:linear-gradient(120deg,var(--pink-4),var(--pink-5));
+  color:#fff; border-color:#fff;
+  box-shadow:0 6px 14px rgba(228,80,138,.28);
+}
+
+/* ---------- 状态行 ---------- */#status{
+  margin-top:12px; padding:10px 16px; border-radius:18px 18px 18px 6px;
+  font-size:12.5px; font-weight:700; line-height:1.55; flex:0 0 auto;
+  background:linear-gradient(160deg,var(--pink-0),var(--pink-1));
+  border:2.5px solid var(--pink-3); color:var(--deep-2); box-shadow:var(--shadow-soft);
+}
+#status.ok{ border-color:var(--mint); color:#2f7d68; }
+#status.err{ border-color:#ff9bb0; color:#b3224f; }
+
+/* ---------- 频道 / 成员 ---------- */
+.chans{
+  margin-top:8px; border:3px solid var(--line); border-radius:var(--r-tile);
+  background:var(--pink-0); box-shadow:var(--shadow-soft);
+}
+.chans .empty{ padding:16px; color:var(--deep); opacity:.7; font-size:12px; font-weight:700; }
+.chan{
+  padding:9px 15px; border-bottom:1px solid var(--pink-1);
+  cursor:var(--cursor-heart) 10 10,pointer; transition:background .15s;
+}
+.chan:last-child{ border-bottom:none; }
+.chan:hover{ background:var(--pink-1); }
+.chan.here{ background:linear-gradient(90deg,var(--pink-1),var(--pink-0)); cursor:default; }
+.chan .cname{ font-size:13.5px; color:var(--deep-2); font-weight:700; }
+.chan.here .cname{ color:var(--pink-5); font-weight:800; }
+.chan .cnt{
+  float:right; font-size:11px; font-weight:800; color:var(--pink-5);
+  background:var(--pink-1); border:1px solid var(--pink-2);
+  border-radius:999px; padding:1px 10px;
+}
+.chan .mems{ margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; }
+.chan .mem{
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+  color:var(--deep); background:var(--pink-0); border:2px solid var(--pink-2);
+  border-radius:999px; padding:2px 10px;
+}
+.chan .mem.me{ color:var(--mint); border-color:var(--mint); }
+.chan .mem.talking{ color:var(--pink-4); border-color:var(--pink-4); background:rgba(255,127,174,.14); }
+.chan .mem.muted{ opacity:.55; text-decoration:line-through; }
+.chan .mem input[type=range]{ width:56px; height:12px; margin:0; accent-color:var(--pink-4); cursor:pointer; }
+
+#speakers{ margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; }
+.sp{
+  font-size:12px; font-weight:700; padding:3px 11px; border-radius:999px;
+  background:var(--pink-0); border:2px solid var(--pink-2); color:var(--deep);
+}
+.sp.talking{ background:linear-gradient(120deg,var(--pink-4),var(--pink-5)); color:#fff; border-color:#fff; }
+
+.hint{ font-size:11px; color:var(--deep); opacity:.72; font-weight:700; margin-top:8px; line-height:1.7; }
+
+/* ---------- 立绘：.char{flex:1} 已把它踩在框底；这里留出气泡位置换整栏宽气泡 ---------- */
+.side{ padding-bottom:0; }
+.char{ padding-top:84px; }
+.char .bubble{
+  top:0; left:0; right:0;
+  max-width:none; max-height:78px; overflow:hidden;
+  font-size:12.5px; line-height:1.5;
+}
+.char .bubble::after{ left:38px; }
+
+/* 装饰层：外框若保持 overflow:hidden（导航页原样），这层其实多余，留着可兼容 */
+.deco-clip{
+  position:absolute; inset:0; overflow:hidden; pointer-events:none;
+  border-radius:var(--r-frame); z-index:0;
+}
+
+/* ---------- 暗色模式下，导航页硬编码白色的几个地方（气泡）也跟着变 ---------- */
+html[data-theme="dark"] .char .bubble{
+  background:linear-gradient(160deg,var(--pink-1),var(--pink-0));
+  color:var(--deep-2); border-color:var(--pink-3);
+}
+html[data-theme="dark"] .char .bubble::after{ border-top-color:var(--pink-3); }
+html[data-theme="dark"] .pet-bubble{
+  background:var(--pink-1); color:var(--deep-2); border-color:var(--pink-3);
+}
+html[data-theme="dark"] input[type=text]::placeholder{ color:#8d6b7d; }
+html[data-theme="dark"] #status.ok{ color:#8fd9c4; }
+html[data-theme="dark"] #status.err{ color:#ff9bb0; }

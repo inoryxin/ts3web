@@ -1,0 +1,138 @@
+:root{
+  --pink-0:#fffafd; --pink-1:#fff0f7; --pink-2:#ffd6e8; --pink-3:#ffb3d3;
+  --pink-4:#ff7fae; --pink-5:#e4508a; --deep:#8a4262; --deep-2:#6b2f4b;
+  --gold:#e8b866; --mint:#8fd9c4; --lav:#b9a7f0; --line:#ffb3d3;
+  --font:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei UI","Microsoft YaHei",
+         "Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-frame:34px; --r-tile:22px;
+  --shadow-soft:0 10px 26px rgba(214,110,160,.16);
+  --shadow-pop:0 20px 44px rgba(228,80,138,.28);
+}
+*{ box-sizing:border-box; }
+/* 整页固定浅色：不然系统深色模式下，复选框/滑块/进度条会变深色，跟粉色主题打架 */
+:root{ color-scheme: light; }
+body{
+  margin:0; min-height:100vh; font-family:var(--font); color:var(--deep-2);
+  background-color:#ffeef6;
+  background-image:linear-gradient(150deg,#ffd9e8,#fff2f8 42%,#e9f2ff);
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:24px 14px 44px; position:relative; overflow-x:hidden;
+}
+/* 飘落的樱花 */
+.sakura{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.petal{ position:absolute; top:-32px; color:#ffb3d3; opacity:.75; animation:fall linear infinite; }
+@keyframes fall{ to{ transform:translateY(112vh) rotate(340deg); } }
+
+.card{
+  position:relative; z-index:1; width:min(640px,96vw);
+  background:linear-gradient(170deg,#fff,#fff8fc 55%,#fff);
+  border:2.5px solid var(--line); border-radius:var(--r-frame);
+  box-shadow:var(--shadow-pop); padding:22px 24px 18px;
+}
+.brand{ display:flex; align-items:center; gap:13px; margin:2px 0 4px; }
+.brand img{
+  height:46px; width:auto; max-width:200px; object-fit:contain;
+  filter:drop-shadow(0 3px 7px rgba(228,80,138,.28));
+}
+h1{
+  margin:0; font-size:19px; font-weight:800; letter-spacing:.02em; line-height:1.25;
+  background:linear-gradient(100deg,var(--pink-5),var(--pink-4) 45%,var(--gold));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.sub{ margin:4px 0 0; font-size:12px; color:#b9829e; font-weight:600; }
+
+.badge{
+  float:right; margin-left:10px; font-size:11px; padding:3px 11px; border-radius:999px;
+  border:2px solid var(--pink-3); background:#fff; color:var(--pink-5); font-weight:800;
+}
+.badge.on{ background:linear-gradient(120deg,var(--pink-4),var(--pink-5)); color:#fff; border-color:#fff; }
+
+label{ display:block; font-size:12.5px; font-weight:800; color:var(--pink-5); margin:15px 0 6px; }
+input[type=text]{
+  width:100%; padding:11px 13px; border-radius:14px; border:2.5px solid var(--line);
+  background:#fff; color:var(--deep-2); font-size:15px; outline:none; font-family:inherit;
+}
+input[type=text]:focus{ border-color:var(--pink-4); box-shadow:0 0 0 4px rgba(255,127,174,.18); }
+
+.row{ display:flex; gap:10px; margin-top:16px; }
+button{
+  flex:1; padding:11px 16px; border-radius:999px; border:2.5px solid var(--line);
+  background:#fff; color:var(--pink-5); font-size:15px; font-weight:800; cursor:pointer;
+  font-family:inherit; transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+button:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 8px 18px rgba(228,80,138,.24); }
+button:disabled{ opacity:.45; cursor:not-allowed; }
+button.primary{ background:linear-gradient(120deg,var(--pink-4),var(--pink-5)); color:#fff; border-color:#fff; }
+button.danger{ background:linear-gradient(120deg,#ff9bb0,#e4508a); color:#fff; border-color:#fff; }
+
+.vol{ display:flex; align-items:center; gap:10px; margin-top:12px; }
+.vol input[type=range]{ flex:1; accent-color:var(--pink-4); cursor:pointer; }
+.vol span{ font-size:12px; color:#c58fa9; font-weight:800; width:46px; text-align:right; }
+meter{ display:block; width:100%; height:10px; margin-top:8px; }
+
+#status{
+  margin-top:14px; padding:11px 14px; border-radius:18px 18px 18px 6px;
+  font-size:13px; font-weight:700; line-height:1.55;
+  background:linear-gradient(160deg,#fff,#fff5fa); border:2.5px solid var(--pink-3);
+  color:var(--deep-2); box-shadow:var(--shadow-soft);
+}
+#status.ok{ border-color:var(--mint); color:#2f7d68; }
+#status.err{ border-color:#ff9bb0; color:#b3224f; }
+
+/* 二级菜单：音频设置 */
+details.settings{
+  margin-top:15px; border:2.5px solid var(--pink-2); border-radius:var(--r-tile);
+  background:#fff8fc; overflow:hidden;
+}
+details.settings>summary{
+  cursor:pointer; padding:12px 15px; font-size:13.5px; font-weight:800;
+  color:var(--pink-5); list-style:none; user-select:none;
+}
+details.settings>summary::-webkit-details-marker{ display:none; }
+details.settings>summary::before{ content:"⚙ "; }
+details.settings>summary::after{ content:"　▾"; font-size:11px; opacity:.7; }
+details.settings[open]>summary::after{ content:"　▴"; }
+details.settings[open]>summary{ border-bottom:2px dashed var(--pink-2); }
+.settings-body{ padding:2px 15px 15px; }
+.grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px 12px; }
+label.chk{
+  display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700;
+  color:var(--deep-2); margin:6px 0; cursor:pointer;
+}
+label.chk input{ accent-color:var(--pink-4); }
+.ttl{ font-size:11.5px; font-weight:800; color:var(--pink-5); margin:13px 0 3px; letter-spacing:.03em; }
+
+/* 频道 / 成员 */
+.chans{
+  margin-top:10px; border:2.5px solid var(--pink-2); border-radius:var(--r-tile);
+  background:#fff; max-height:290px; overflow-y:auto;
+}
+.chans .empty{ padding:15px; color:#c58fa9; font-size:12px; font-weight:700; }
+.chan{ padding:9px 13px; border-bottom:1px solid var(--pink-1); cursor:pointer; transition:background .15s; }
+.chan:last-child{ border-bottom:none; }
+.chan:hover{ background:var(--pink-1); }
+.chan.here{ background:linear-gradient(90deg,#fff2f8,#fff); cursor:default; }
+.chan .cname{ font-size:14px; color:var(--deep-2); font-weight:700; }
+.chan.here .cname{ color:var(--pink-5); }
+.chan .cnt{
+  float:right; font-size:11px; font-weight:800; color:var(--pink-5);
+  background:#ffe6f1; border-radius:999px; padding:1px 9px;
+}
+.chan .mems{ margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; }
+.chan .mem{
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+  color:#a86585; background:#fff; border:2px solid var(--pink-2);
+  border-radius:999px; padding:2px 9px;
+}
+.chan .mem.me{ color:#2f7d68; border-color:var(--mint); }
+.chan .mem.talking{ color:var(--pink-5); border-color:var(--pink-4); background:#ffeaf3; }
+.chan .mem input[type=range]{ width:56px; height:12px; margin:0; accent-color:var(--pink-4); cursor:pointer; }
+
+#speakers{ margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; min-height:0; }
+.sp{
+  font-size:12px; font-weight:700; padding:3px 11px; border-radius:999px;
+  background:#fff; border:2px solid var(--pink-2); color:#a86585;
+}
+.sp.talking{ background:linear-gradient(120deg,var(--pink-4),var(--pink-5)); color:#fff; border-color:#fff; }
+
+.hint{ font-size:11.5px; color:#c58fa9; font-weight:700; margin-top:10px; line-height:1.75; }

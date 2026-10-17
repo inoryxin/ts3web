@@ -1,0 +1,26 @@
+[package]
+name = "ts3web"
+version = "0.1.0"
+edition = "2021"
+description = "浏览器网页客户端 <-> TeamSpeak 3 语音网关（WebSocket + WebCodecs Opus 直通）"
+
+[dependencies]
+anyhow = "1"
+# 自检模式要自己编码 Opus 测试音（与 tsclientlib 用的是同一个底层库）
+audiopus = "0.2"
+futures-util = "0.3"
+slog = "2"
+slog-async = "2"
+slog-term = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt", "macros", "net", "sync", "time", "fs"] }
+tokio-tungstenite = "0.30"
+# TS3 协议实现（含双向语音：audio feature 启用 audiopus）
+tsclientlib = { version = "0.2", features = ["audio"] }
+# TS3 语音包的原始结构（tsclientlib 内部也用它，版本必须一致）
+tsproto-packets = "0.1"
+
+# NAS 上只有 1 个核，别开 LTO，编译时间会成倍增加
+[profile.release]
+opt-level = 2
